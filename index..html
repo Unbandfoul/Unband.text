@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WA Account Recovery Tool | Official Interface</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --wa-green: #25D366;
+            --wa-dark-green: #128C7E;
+            --wa-teal: #075E54;
+            --bg-light: #e6eee0; /* Warna dasar kehijauan sangat muda */
+            --text-main: #1c1c1c;
+            --text-sub: #555;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* Latar Belakang Gradasi Kece & Modern */
+            background: linear-gradient(135deg, #d4fcd4 0%, #e6eee0 50%, #ffffff 100%);
+            background-size: cover;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95); /* Sedikit transparan */
+            width: 100%;
+            max-width: 480px;
+            padding: 40px;
+            border-radius: 24px;
+            /* Efek Bayangan Lembut & Mewah (Glassmorphism Lite) */
+            box-shadow: 0 15px 35px rgba(37, 211, 102, 0.15);
+            text-align: center;
+            backdrop-filter: blur(5px); /* Efek blur di belakang kotak */
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Garis Hijau di Atas Kotak */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, var(--wa-green), var(--wa-dark-green));
+        }
+
+        .logo-area {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--wa-green);
+        }
+
+        h2 {
+            color: var(--text-main);
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 1.6rem;
+        }
+
+        p.subtitle {
+            color: var(--text-sub);
+            font-size: 0.95rem;
+            margin-bottom: 35px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--wa-teal);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--wa-green);
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(37, 211, 102, 0.1);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(to right, var(--wa-green), var(--wa-dark-green));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(37, 211, 102, 0.3);
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 22px rgba(37, 211, 102, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(-1px);
+        }
+
+        /* Status Loading & Success */
+        #loader { display: none; margin: 30px 0; }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--wa-green);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #success-container { display: none; }
+
+        .success-icon {
+            font-size: 60px;
+            color: var(--wa-green);
+            margin-bottom: 20px;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .success-text {
+            color: #155724;
+            font-weight: 600;
+            background: #d4edda;
+            padding: 20px;
+            border-radius: 14px;
+            border: 1px solid #c3e6cb;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .ticket-box {
+            font-size: 13px;
+            color: #777;
+            margin-top: 25px;
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        /* Animasi Sederhana */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate { animation: fadeIn 0.6s ease forwards; }
+
+        /* Responsive HP */
+        @media (max-width: 480px) {
+            .card { padding: 30px 20px; border-radius: 20px; }
+            h2 { font-size: 1.4rem; }
+            .logo-area { font-size: 2.5rem; }
+            .btn-submit { padding: 16px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card animate">
+        <div id="form-content">
+            <div class="logo-area">💬</div>
+            <h2>Account Recovery</h2>
+            <p class="subtitle">Silakan masukkan nomor WhatsApp Anda yang terblokir dan metode banding untuk diproses oleh sistem.</p>
+
+            <div class="form-group">
+                <label>Nomor Telepon Terblokir (Gunakan Kode Negara)</label>
+                <input type="text" id="wa_number" placeholder="Contoh: 628123456789" required>
+            </div>
+
+            <div class="form-group">
+                <label>Metode Pesan (Custom Appeal Script)</label>
+                <textarea id="custom_method" rows="6" placeholder="Masukkan kalimat banding Anda di sini..."></textarea>
+            </div>
+
+            <button class="btn-submit" onclick="startProcess()">Eksekusi & Kirim Banding</button>
+        </div>
+
+        <div id="loader">
+            <div class="spinner"></div>
+            <p style="color: var(--wa-teal); font-weight: 500;">Menghubungkan ke API WhatsApp Support...</p>
+            <div style="font-size: 12px; color: #888;">Proses ini biasanya memakan waktu beberapa detik.</div>
+        </div>
+
+        <div id="success-container" class="animate">
+            <div class="success-icon">✅</div>
+            <h3>Permintaan Terkirim!</h3>
+            <div class="success-text">
+                Kiriman Anda **berhasil diproses** melalui sistem otomatis kami dan telah diteruskan ke Tim Dukungan WhatsApp.
+            </div>
+            <div class="ticket-box">
+                Tiket ID: #WA-REQ-<span id="ticket-id"></span>
+            </div>
+            <p style="font-size: 12px; color: #999; margin-top: 15px;">Silakan cek email atau nomor Anda secara berkala.</p>
+        </div>
+    </div>
+
+    <script>
+        // Konfigurasi & Logic
+        function startProcess() {
+            const num = document.getElementById('wa_number').value;
+            const method = document.getElementById('custom_method').value;
+
+            // Validasi Simpel
+            if (!num || !method) {
+                alert("Harap lengkapi nomor telepon dan metode pesan banding!");
+                return;
+            }
+
+            // UI Interaction: Hide Form, Show Loader
+            document.getElementById('form-content').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+
+            // Simulasi "Processing" selama 3 detik (biar kelihatan mikir)
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('success-container').style.display = 'block';
+                
+                // Generate Ticket ID Acak agar terlihat asli
+                document.getElementById('ticket-id').innerText = Math.floor(1000000 + Math.random() * 9000000);
+            }, 3000);
+
+            // "Config" Data (Bisa dilihat di Console Log F12)
+            const configData = {
+                target: num,
+                payload: method,
+                timestamp: new Date().toISOString(),
+                status: "Queued for API Submission"
+            };
+            console.log("Config Data Sent:", configData);
+        }
+    </script>
+
+</body>
+</html>
