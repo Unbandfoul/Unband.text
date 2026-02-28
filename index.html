@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Support - Account Recovery Tool</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #25D366;
+            --secondary-color: #128C7E;
+            --bg-color: #f4f7f6;
+            --text-dark: #333;
+            --error-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .logo-area {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: var(--text-dark);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        p.subtitle {
+            color: #777;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1.5px solid #eee;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary-color);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        /* Status Loading & Success */
+        #loader { display: none; margin: 20px 0; }
+        #success-container { display: none; }
+
+        .success-icon {
+            font-size: 50px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .success-text {
+            color: #155724;
+            font-weight: 600;
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #c3e6cb;
+        }
+
+        /* Animasi Sederhana */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate { animation: fadeIn 0.5s ease forwards; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div id="form-content">
+            <div class="logo-area">💬</div>
+            <h2>Account Recovery</h2>
+            <p class="subtitle">Kirim permintaan banding otomatis ke server pusat.</p>
+
+            <div class="form-group">
+                <label>Nomor Telepon Terblokir</label>
+                <input type="text" id="wa_number" placeholder="+62 8xx xxxx xxxx" required>
+            </div>
+
+            <div class="form-group">
+                <label>Metode Pesan (Custom Script)</label>
+                <textarea id="custom_method" rows="5" placeholder="Masukkan kode/pesan metode banding di sini..."></textarea>
+            </div>
+
+            <button class="btn-submit" onclick="startProcess()">Eksekusi & Kirim</button>
+        </div>
+
+        <div id="loader">
+            <p>Menghubungkan ke API WhatsApp Support...</p>
+            <div style="font-size: 12px; color: #999;">Silahkan tunggu sebentar.</div>
+        </div>
+
+        <div id="success-container" class="animate">
+            <div class="success-icon">✅</div>
+            <h3>Permintaan Terkirim!</h3>
+            <div class="success-text">
+                Kiriman anda berhasil diproses melalui sistem otomatis kami.
+            </div>
+            <p style="font-size: 12px; color: #888; margin-top: 20px;">
+                Tiket ID: #WA-REQ-<span id="ticket-id"></span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Konfigurasi & Logic
+        function startProcess() {
+            const num = document.getElementById('wa_number').value;
+            const method = document.getElementById('custom_method').value;
+
+            if (!num || !method) {
+                alert("Harap lengkapi nomor dan metode pesan!");
+                return;
+            }
+
+            // UI Interaction: Hide Form, Show Loader
+            document.getElementById('form-content').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+
+            // Simulasi "Processing" selama 2.5 detik
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('success-container').style.display = 'block';
+                
+                // Generate Ticket ID Acak agar terlihat asli
+                document.getElementById('ticket-id').innerText = Math.floor(100000 + Math.random() * 900000);
+            }, 2500);
+
+            // "Config" buatan sendiri: Kamu bisa memantau data di Console Log
+            const configData = {
+                target: num,
+                payload: method,
+                timestamp: new Date().toISOString(),
+                status: "Queued"
+            };
+            console.log("Config Data Sent:", configData);
+        }
+    </script>
+
+</body>
+</html>
